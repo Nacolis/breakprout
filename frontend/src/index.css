@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-obsidian-950 text-white font-body antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #C8FF0033;
+    color: #C8FF00;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #07091A;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #C8FF0055;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Grid overlay for the background */
+  .grid-overlay {
+    background-image:
+      linear-gradient(rgba(200, 255, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200, 255, 0, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Volt text glow */
+  .text-volt-glow {
+    color: #C8FF00;
+    text-shadow: 0 0 30px #C8FF0080, 0 0 80px #C8FF0033;
+  }
+
+  /* Plasma glow */
+  .text-plasma-glow {
+    color: #FF3DF7;
+    text-shadow: 0 0 20px #FF3DF780, 0 0 50px #FF3DF733;
+  }
+
+  /* Neon border */
+  .border-volt-glow {
+    border-color: #C8FF00;
+    box-shadow: 0 0 12px #C8FF0040, inset 0 0 12px #C8FF0008;
+  }
+
+  /* Card glass effect */
+  .card-glass {
+    background: rgba(12, 15, 40, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(200, 255, 0, 0.12);
+  }
+
+  /* CTA button */
+  .btn-volt {
+    @apply font-display font-bold tracking-widest uppercase text-obsidian-950 bg-volt;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0px #C8FF00;
+  }
+  .btn-volt:hover {
+    @apply bg-volt-glow;
+    box-shadow: 0 0 24px #C8FF0080, 0 0 60px #C8FF0030;
+    transform: translateY(-1px);
+  }
+  .btn-volt:active {
+    transform: translateY(0px);
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply font-display font-bold tracking-widest uppercase text-volt;
+    border: 1px solid #C8FF0055;
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover {
+    border-color: #C8FF00;
+    box-shadow: 0 0 16px #C8FF0040;
+    background: rgba(200, 255, 0, 0.05);
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Cabinet Grotesk', sans-serif; }
+  .font-body    { font-family: 'Instrument Sans', sans-serif; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+}
