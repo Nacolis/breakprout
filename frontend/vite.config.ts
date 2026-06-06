@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    allowedHosts: ['breakprout.local', 'localhost'],
+    allowedHosts: ['breakprout.local', 'localhost', 'frontend'],
     proxy: {
       // Proxy /api calls to the FastAPI backend during local dev
       '/api': {
