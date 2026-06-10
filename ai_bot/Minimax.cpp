@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:38:49 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 15:36:40 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/10 16:03:33 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,27 +104,31 @@ std::vector<Breakthrough::t_move>
 		for (int col = 0; col < boardSize; col++) {
 			if (board[row][col] != player)
 				continue;
-
+			
 			int	nextRow = row + dir;
 			if (!game.isValidSquare(nextRow, col))
 				continue;
 
 			/* Check forward */
-			if (board[nextRow][col] == Breakthrough::EMPTY)
-				moves.push_back({row, col, nextRow, col});
+			if (board[nextRow][col] == Breakthrough::EMPTY) {
+				Breakthrough::t_move move = {row, col, nextRow, col};
+				moves.push_back(move);
+			}
 
 			/* Check left diagonal */
 			if (game.isValidSquare(nextRow, col - 1) &&
 					board[nextRow][col - 1] != player)
 			{
-				moves.push_back({row, col, nextRow, col - 1});	
+				Breakthrough::t_move move = {row, col, nextRow, col - 1};
+				moves.push_back(move);	
 			}
 
 			/* Check right diagonal */
 			if (game.isValidSquare(nextRow, col + 1) &&
 					board[nextRow][col + 1] != player)
 			{
-				moves.push_back({row, col, nextRow, col + 1});	
+				Breakthrough::t_move move = {row, col, nextRow, col + 1};
+				moves.push_back(move);	
 			}
 		}
 	}
@@ -133,7 +137,7 @@ std::vector<Breakthrough::t_move>
 
 int	Minimax::evaluate(Breakthrough &game, int const &boardSize) {
 	
-	std::vector<std::vector<int >> const	&board = game.getBoard();
+	std::vector<std::vector<int> > const	&board = game.getBoard();
 
 	int score = 0;
 	for (int row = 0; row < boardSize; row++) {
