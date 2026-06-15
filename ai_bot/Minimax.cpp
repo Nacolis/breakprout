@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:38:49 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 16:03:33 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/12 15:43:21 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,17 @@ Breakthrough::t_move	Minimax::findBestMove(Breakthrough &game, int const &boardS
 		bestScore = INT_MAX;
 	
 	for (std::vector<Breakthrough::t_move>::iterator it = moves.begin(); it != moves.end(); it++) {
+
 		Breakthrough child(game);
 		child.makeMove(*it);
-		
+
 		Breakthrough::e_state nextPlayer;
 		if (player == Breakthrough::WHITE)
 			nextPlayer = Breakthrough::BLACK;
 		else
 			nextPlayer = Breakthrough::WHITE;
 		
-		int	score = minimax(game, boardSize, depth, nextPlayer);
+		int	score = minimax(child, boardSize, depth, nextPlayer, INT_MIN, INT_MAX);
 		if (player == Breakthrough::WHITE) {
 			if (score > bestScore) {
 				bestScore = score;
@@ -51,7 +52,7 @@ Breakthrough::t_move	Minimax::findBestMove(Breakthrough &game, int const &boardS
 }
 
 
-int	Minimax::minimax(Breakthrough &game, int const &boardSize, int depth, Breakthrough::e_state player) {
+int	Minimax::minimax(Breakthrough &game, int const &boardSize, int depth, Breakthrough::e_state player, int alpha, int beta) {
 
 	if (depth == 0 || game.isGameOver())
 		return (evaluate(game, boardSize));
@@ -65,8 +66,11 @@ int	Minimax::minimax(Breakthrough &game, int const &boardSize, int depth, Breakt
 			Breakthrough child(game);
 			child.makeMove(*it);
 			Breakthrough::e_state nextPlayer = Breakthrough::BLACK;
-			int eval = minimax(child, boardSize, depth - 1, nextPlayer);
+			int eval = minimax(child, boardSize, depth - 1, nextPlayer,  alpha, beta);
 			maxEval = std::max(maxEval, eval);
+			alpha = std::max(alpha, eval);
+			if (beta <= alpha)
+				break ;
 		}
 		return (maxEval);
 	}
@@ -79,8 +83,11 @@ int	Minimax::minimax(Breakthrough &game, int const &boardSize, int depth, Breakt
 			Breakthrough child(game);
 			child.makeMove(*it);
 			Breakthrough::e_state nextPlayer = Breakthrough::WHITE;
-			int eval = minimax(child, boardSize, depth - 1, nextPlayer);
+			int eval = minimax(child, boardSize, depth - 1, nextPlayer, alpha, beta);
 			minEval = std::min(minEval, eval);
+			beta = std::min(beta, eval);
+			if (beta <= alpha)
+				break ;
 		}
 		return (minEval);
 	}
@@ -116,18 +123,18 @@ std::vector<Breakthrough::t_move>
 			}
 
 			/* Check left diagonal */
-			if (game.isValidSquare(nextRow, col - 1) &&
-					board[nextRow][col - 1] != player)
+			if (game.isValidSquare(nextRow, col - dir) &&
+					board[nextRow][col - dir] != player)
 			{
-				Breakthrough::t_move move = {row, col, nextRow, col - 1};
+				Breakthrough::t_move move = {row, col, nextRow, col - dir};
 				moves.push_back(move);	
 			}
 
 			/* Check right diagonal */
-			if (game.isValidSquare(nextRow, col + 1) &&
-					board[nextRow][col + 1] != player)
+			if (game.isValidSquare(nextRow, col + dir) &&
+					board[nextRow][col + dir] != player)
 			{
-				Breakthrough::t_move move = {row, col, nextRow, col + 1};
+				Breakthrough::t_move move = {row, col, nextRow, col + dir};
 				moves.push_back(move);	
 			}
 		}
@@ -143,12 +150,32 @@ int	Minimax::evaluate(Breakthrough &game, int const &boardSize) {
 	for (int row = 0; row < boardSize; row++) {
 		for (int col = 0; col < boardSize; col++) {
 			if (board[row][col] == Breakthrough::WHITE) {
-				score += 100;
-				score += row * 10;
+				/* Score from number of material */
+				score += 1000;
+				/* Score from distance traveled */
+				score += row * 20;
+				/* Score from center control */
+				if (col >= (boardSize / 2) - 1 && col <= boardSize / 2)
+					score += 10;
+				/* Score from protected material */
+				if ((row - 1 >= 0) && (col - 1 >= 0) && (col + 1 < boardSize)) {
+					if(board[row - 1][col - 1] == Breakthrough::WHITE || board[row - 1][col + 1] == Breakthrough::WHITE)
+						score += 20;
+				}
 			}
 			else if (board[row][col] == Breakthrough::BLACK) {
-				score -= 100;
-				score -= (boardSize - 1 - row) * 10;
+				/* Score from number of material */
+				score -= 1000;
+				/* Score from distance traveled */
+				score -= (boardSize - 1 - row) * 20;
+				/* Score from center control */
+				if (col >= (boardSize / 2) - 1 && col <= boardSize / 2)
+					score -= 10;
+				/* Score from protected material */
+				if ((row + 1 < boardSize) && (col - 1 >= 0) && (col + 1 < boardSize)) {
+					if (board[row + 1][col - 1] == Breakthrough::BLACK || board[row + 1][col + 1] == Breakthrough::BLACK)
+						score -= 20;
+				}
 			}
 		}
 	}

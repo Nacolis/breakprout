@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:38:44 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 15:33:52 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/12 14:36:02 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class	Minimax {
 		Minimax	&operator=(Minimax const &other);
 
 		std::vector<Breakthrough::t_move> static	generateMoves(Breakthrough &game, int const &boardSize, Breakthrough::e_state player);
-		int	static	minimax(Breakthrough &game, int const &boardSize, int depth, Breakthrough::e_state player);
+		int	static	minimax(Breakthrough &game, int const &boardSize, int depth, Breakthrough::e_state player, int alpha, int beta);
 		int static	evaluate(Breakthrough &game, int const &boardSize);
 };
 

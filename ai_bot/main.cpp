@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:18 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 15:39:40 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/15 13:38:37 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,13 @@
 
 int	main(void) {
 
-	Breakthrough			game;
+	int						boardSize = BOARD_SIZE;
+	Breakthrough			game(boardSize);
 	Breakthrough::t_move	bestMove;
 	Breakthrough::e_state	player = Breakthrough::WHITE;
 
 	while (!game.isGameOver()) {
-		bestMove = Minimax::findBestMove(game, game.getBoardSize(), 3, player);
+		bestMove = Minimax::findBestMove(game, game.getBoardSize(), 5, player);
 		game.makeMove(bestMove);
 		game.printBoard();
 		std::cout << std::endl;

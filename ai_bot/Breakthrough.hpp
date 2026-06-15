@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:45:36 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 15:35:23 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/12 15:18:51 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <iostream>
 # include <vector>
 
-# define BOARD_SIZE 6
+# define BOARD_SIZE 7
 # define PLAYING 1
 # define ENDED 0
 
