@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:38:49 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/12 15:43:21 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/15 20:48:10 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,22 +146,38 @@ int	Minimax::evaluate(Breakthrough &game, int const &boardSize) {
 	
 	std::vector<std::vector<int> > const	&board = game.getBoard();
 
-	int score = 0;
+	int		score = 0;
 	for (int row = 0; row < boardSize; row++) {
 		for (int col = 0; col < boardSize; col++) {
+			int		nbDefenders = 0;
 			if (board[row][col] == Breakthrough::WHITE) {
 				/* Score from number of material */
 				score += 1000;
 				/* Score from distance traveled */
 				score += row * 20;
 				/* Score from center control */
-				if (col >= (boardSize / 2) - 1 && col <= boardSize / 2)
+				if (row >= (boardSize / 2) && col >= (boardSize / 2) - 1 && col <= boardSize / 2)
 					score += 10;
 				/* Score from protected material */
-				if ((row - 1 >= 0) && (col - 1 >= 0) && (col + 1 < boardSize)) {
-					if(board[row - 1][col - 1] == Breakthrough::WHITE || board[row - 1][col + 1] == Breakthrough::WHITE)
-						score += 20;
+				if (row - 1 >= 0) {
+					if (col - 1 >= 0 && board[row - 1][col - 1] == Breakthrough::WHITE)
+						nbDefenders++;
+					if (col + 1 < boardSize && board[row - 1][col + 1] == Breakthrough::WHITE)
+						nbDefenders++;
+					if (nbDefenders)
+						score += nbDefenders * 20;
 				}
+				/* Score from attacking material */
+				if ((row + 1 < boardSize) && 
+					((col - 1 >= 0 && board[row + 1][col - 1] == Breakthrough::BLACK) ||
+					(col + 1 < boardSize && board[row + 1][col + 1] == Breakthrough::BLACK))) {
+					score += 20;
+					if (nbDefenders)
+						score += nbDefenders * 40;
+				}
+				/* Score from winning */
+				if (row == boardSize - 1)
+					score += 100000;
 			}
 			else if (board[row][col] == Breakthrough::BLACK) {
 				/* Score from number of material */
@@ -169,13 +185,28 @@ int	Minimax::evaluate(Breakthrough &game, int const &boardSize) {
 				/* Score from distance traveled */
 				score -= (boardSize - 1 - row) * 20;
 				/* Score from center control */
-				if (col >= (boardSize / 2) - 1 && col <= boardSize / 2)
+				if (row >= (boardSize / 2) && col >= (boardSize / 2) - 1 && col <= boardSize / 2)
 					score -= 10;
 				/* Score from protected material */
-				if ((row + 1 < boardSize) && (col - 1 >= 0) && (col + 1 < boardSize)) {
-					if (board[row + 1][col - 1] == Breakthrough::BLACK || board[row + 1][col + 1] == Breakthrough::BLACK)
-						score -= 20;
+				if (row + 1 < boardSize) { 
+					if (col - 1 >= 0 && board[row + 1][col - 1] == Breakthrough::BLACK)
+						nbDefenders++;
+					if (col + 1 < boardSize && board[row + 1][col + 1] == Breakthrough::BLACK)
+						nbDefenders++;
+					if (nbDefenders)
+						score -= nbDefenders * 20;
 				}
+				/* Score from attacking material */
+				if ((row - 1 >= 0) &&
+					((col - 1 >= 0 && board[row - 1][col - 1] == Breakthrough::WHITE) ||
+					(col + 1 < boardSize && board[row - 1][col + 1] == Breakthrough::WHITE))) {
+					score -= 20;
+					if (nbDefenders)
+						score -= nbDefenders * 40;
+				}
+				/* Score from winning */
+				if (row == 0)
+					score -= 100000;
 			}
 		}
 	}
