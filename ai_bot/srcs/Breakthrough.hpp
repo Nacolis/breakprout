@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:45:36 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/12 15:18:51 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:19:36 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <vector>
+# include <string>
 
 # define BOARD_SIZE 7
 # define PLAYING 1
@@ -36,24 +37,26 @@ class	Breakthrough {
 
 		Breakthrough();
 		Breakthrough(int &boardSize);
+		Breakthrough(std::string &board);
 		Breakthrough(Breakthrough const &other);
 		Breakthrough &operator=(Breakthrough const &other);
 		~Breakthrough();
 
-		void initializeBoard();
-		void printBoard() const;
-
-		// std::vector<t_move> generateMoves(e_state player) const;
+		
+		void	initializeBoard();
+		void	initializeBoard(std::string &board);
+		int		findBoardSize(std::string &board);
 
 		bool	isValidSquare(int row, int col);
 		bool	isGameOver();
-
 		bool 	whiteWins();
 		bool 	blackWins();
-
+	
 		void 	makeMove(t_move const &move);
-
 		int		countPieces(e_state player);
+
+		void	printBoard() const;
+		void	convertBoard() const;
 
 		std::vector<std::vector<int> > const	&getBoard() const;
 		int		getBoardSize() const;

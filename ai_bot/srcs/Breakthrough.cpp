@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:45:59 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/10 15:42:36 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:22:41 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@ Breakthrough::Breakthrough() : board_(BOARD_SIZE, std::vector<int>(BOARD_SIZE, E
 
 Breakthrough::Breakthrough(int &boardSize) : board_(boardSize, std::vector<int>(boardSize, EMPTY)), boardSize_(boardSize), gameState_(PLAYING) {
 	initializeBoard();
+}
+
+Breakthrough::Breakthrough(std::string &board) : board_(findBoardSize(board), std::vector<int>(findBoardSize(board), EMPTY)), boardSize_(findBoardSize(board)), gameState_(PLAYING) {
+	initializeBoard(board);
 }
 
 Breakthrough::~Breakthrough() {
@@ -52,6 +56,25 @@ void	Breakthrough::initializeBoard() {
 	}
 }
 
+void	Breakthrough::initializeBoard(std::string &board) {
+	
+	int	row = 0, col = 0;
+	for (std::string::iterator it = board.begin(); it != board.end(); it++) {
+		if (*it == ';') {
+			col = 0;
+			row++;
+			continue ;
+		}
+		board_[row][col] = *it - '0';
+		col++;
+	}
+}
+
+int		Breakthrough::findBoardSize(std::string &board) {
+
+	return (board.find(';'));
+}
+
 bool	Breakthrough::isValidSquare(int row, int col) {
 
 	return (
@@ -59,15 +82,6 @@ bool	Breakthrough::isValidSquare(int row, int col) {
 		&& row < boardSize_
 		&& col >= 0
 		&& col < boardSize_ );
-}
-
-void	Breakthrough::printBoard() const {
-
-	for (int row = boardSize_ - 1; row >= 0; row--) {
-		for (int col = 0; col < boardSize_; col++)
-			std::cout << board_[row][col] << " ";
-		std::cout << std::endl;
-	}
 }
 
 void	Breakthrough::makeMove(t_move const &move) {
@@ -119,6 +133,26 @@ bool	Breakthrough::isGameOver() {
 		return (true);
 	}
 	return (false);
+}
+
+void	Breakthrough::printBoard() const {
+
+	for (int row = boardSize_ - 1; row >= 0; row--) {
+		for (int col = 0; col < boardSize_; col++)
+			std::cout << board_[row][col] << " ";
+		std::cout << std::endl;
+	}
+}
+
+void	Breakthrough::convertBoard() const {
+	
+	for (int row = 0; row < boardSize_; row++) {
+		for (int col = 0; col < boardSize_; col++) {
+			std::cout << board_[row][col];
+		}
+		std::cout << ";";
+	}
+	std::cout << std::endl;
 }
 
 std::vector<std::vector<int> > const	&Breakthrough::getBoard() const {

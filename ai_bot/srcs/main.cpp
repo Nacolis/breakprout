@@ -6,30 +6,33 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:18 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/15 20:18:48 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:24:34 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Breakthrough.hpp"
 #include "Minimax.hpp"
+#include <sys/socket.h>
+#include <cstdlib>
 
-int	main(void) {
+int	main(int ac, char*av[]) {
 
-	int						boardSize = BOARD_SIZE;
-	Breakthrough			game(boardSize);
-	Breakthrough::t_move	bestMove;
-	Breakthrough::e_state	player = Breakthrough::WHITE;
-
-	while (!game.isGameOver()) {
-		bestMove = Minimax::findBestMove(game, game.getBoardSize(), 6, player);
-		game.makeMove(bestMove);
-		game.printBoard();
-		std::cout << std::endl;
-		if (player == Breakthrough::WHITE)
-			player = Breakthrough::BLACK;
-		else
-			player = Breakthrough::WHITE;
+	if (ac != 4) {
+		std::cout << "Usage: ./proutfish < \"1x;0x;2x;\", player, depth >" << std::endl;
+		return (1);
 	}
+
+	std::string				board = av[1];
+	Breakthrough			game(board);
+	Breakthrough::e_state	player = Breakthrough::WHITE;
+	Breakthrough::t_move	bestMove;
+
+	if (atoi(av[2]) == Breakthrough::BLACK)
+		player = Breakthrough::BLACK;
+	bestMove = Minimax::findBestMove(game, game.getBoardSize(), atoi(av[3]), player);
+	game.makeMove(bestMove);
+	// game.printBoard();
+	game.convertBoard();
 
 	return (0);
 }
