@@ -2,26 +2,38 @@ from fastapi import WebSocket
 
 
 class ConnectionManager:
-    """Connection manager stub for tracking active WebSockets."""
+    """Connection manager for tracking active WebSockets per game."""
 
     def __init__(self) -> None:
-        self.active_connections: list[WebSocket] = []
+        self.active_connections: dict[int, list[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket) -> None:
+    async def connect(self, websocket: WebSocket, game_id: int) -> None:
+        """Accept WebSocket connection and subscribe it to a game's events."""
         await websocket.accept()
-        self.active_connections.append(websocket)
+        if game_id not in self.active_connections:
+            self.active_connections[game_id] = []
+        self.active_connections[game_id].append(websocket)
 
-    def disconnect(self, websocket: WebSocket) -> None:
-        self.active_connections.remove(websocket)
+    def disconnect(self, websocket: WebSocket, game_id: int) -> None:
+        """Unsubscribe WebSocket connection from a game's events."""
+        if game_id in self.active_connections:
+            if websocket in self.active_connections[game_id]:
+                self.active_connections[game_id].remove(websocket)
+            if not self.active_connections[game_id]:
+                del self.active_connections[game_id]
 
-    async def send_personal_message(
-        self, message: str, websocket: WebSocket
-    ) -> None:
-        await websocket.send_text(message)
+    async def send_personal_message(self, message: dict, websocket: WebSocket) -> None:
+        """Send a JSON message to a single WebSocket client."""
+        await websocket.send_json(message)
 
-    async def broadcast(self, message: str) -> None:
-        for connection in self.active_connections:
-            await connection.send_text(message)
+    async def broadcast_to_game(self, game_id: int, message: dict) -> None:
+        """Broadcast a JSON message to all clients in a specific game."""
+        if game_id in self.active_connections:
+            for connection in self.active_connections[game_id]:
+                try:
+                    await connection.send_json(message)
+                except Exception:
+                    pass
 
 
 manager = ConnectionManager()
