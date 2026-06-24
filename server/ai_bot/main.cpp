@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:18 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/17 17:24:34 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/24 16:20:05 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	main(int ac, char*av[]) {
 	bestMove = Minimax::findBestMove(game, game.getBoardSize(), atoi(av[3]), player);
 	game.makeMove(bestMove);
 	// game.printBoard();
-	game.convertBoard();
+	Breakthrough::printMove(bestMove);
 
 	return (0);
 }

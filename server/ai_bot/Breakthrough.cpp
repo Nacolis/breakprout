@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:45:59 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/17 17:22:41 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/24 16:19:37 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,15 +144,17 @@ void	Breakthrough::printBoard() const {
 	}
 }
 
-void	Breakthrough::convertBoard() const {
-	
-	for (int row = 0; row < boardSize_; row++) {
-		for (int col = 0; col < boardSize_; col++) {
-			std::cout << board_[row][col];
-		}
-		std::cout << ";";
-	}
-	std::cout << std::endl;
+void	Breakthrough::printMove(t_move &move) {
+
+	std::string	res;
+
+	res += 'A' + move.fromRow;
+	res += '1' + move.fromCol;
+	res += ';';
+	res += 'A' + move.toRow;
+	res += '1' + move.toCol;
+	res += ';';
+	std::cout << res << std::endl;
 }
 
 std::vector<std::vector<int> > const	&Breakthrough::getBoard() const {

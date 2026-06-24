@@ -16,6 +16,17 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev
 
+# Use an official GCC 14.3.0 base image
+FROM gcc:14.3.0 as ai_builder
+
+# Copy ai source files
+COPY /ai_bot /usr/src/ai_bot
+
+WORKDIR /usr/src/ai_bot
+
+# Compile ai
+RUN c++ -Werror -Wextra -Wall --std=c++98 *.cpp -o proutfish
+
 # Final light weight runtime stage
 FROM python:3.14-slim
 
@@ -26,6 +37,9 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
 COPY . .
+
+# Copy the ai executable
+COPY --from=ai_builder /usr/src/ai_bot/proutfish /ai_bot/proutfish
 
 # Prepend the virtual environment binaries to the PATH so that uvicorn/alembic run inside the virtualenv
 ENV PATH="/app/.venv/bin:$PATH"

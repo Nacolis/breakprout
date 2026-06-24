@@ -6,7 +6,7 @@
 /*   By: dkittaya <dkittaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:45:36 by dkittaya          #+#    #+#             */
-/*   Updated: 2026/06/17 17:19:36 by dkittaya         ###   ########.fr       */
+/*   Updated: 2026/06/24 16:12:19 by dkittaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,11 @@ class	Breakthrough {
 		void 	makeMove(t_move const &move);
 		int		countPieces(e_state player);
 
-		void	printBoard() const;
-		void	convertBoard() const;
-
 		std::vector<std::vector<int> > const	&getBoard() const;
 		int		getBoardSize() const;
+
+		void		printBoard() const;
+		void static	printMove(t_move &move);
 
 	private:
 		std::vector<std::vector<int> >	board_;
