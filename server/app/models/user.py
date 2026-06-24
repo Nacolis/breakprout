@@ -13,3 +13,4 @@ class User(Base):
         String, unique=True, index=True, nullable=False
     )
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    level: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

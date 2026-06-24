@@ -6,6 +6,10 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from app.core.config import settings
+from app.models.base import Base
+from app.models.user import User  # noqa: F401
+from app.models.game import Game, Move  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,11 +22,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.core.config import settings
-from app.models.base import Base
-from app.models.user import User  # noqa: F401
-# from app.models.game import Game  # noqa: F401
-
 target_metadata = Base.metadata
 
 # Set the sqlalchemy database URL dynamically from the configuration settings
