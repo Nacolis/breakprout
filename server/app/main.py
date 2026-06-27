@@ -28,8 +28,3 @@ def health_check() -> dict[str, str]:
 
 # Include all v1 API and WebSocket routes
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-@app.get("/ai_test")
-def ai_test(board: str, player: str, depth: str) -> str :
-    res = subprocess.run(["/ai_bot/proutfish", board, player, depth], capture_output=True, text=True)
-    return (res.stdout)

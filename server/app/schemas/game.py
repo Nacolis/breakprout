@@ -23,6 +23,7 @@ class MoveResponse(BaseModel):
 
 class GameCreate(BaseModel):
     grid_size: Optional[int] = 8
+    vs_ai: Optional[bool] = False
 
 
 class GameResponse(BaseModel):

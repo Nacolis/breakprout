@@ -1,11 +1,14 @@
+import os
+import asyncio
 from datetime import datetime
 from typing import Optional, Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy.sql import func
 from fastapi import HTTPException, status
 from app.models.game import Game, Move
+from app.models.user import User
+from app.core.database import SessionLocal
 
 
 class BreakthroughBoard:
@@ -155,19 +158,46 @@ async def get_game(db: AsyncSession, game_id: int) -> Optional[Game]:
     return game
 
 
-async def create_game(db: AsyncSession, creator_id: int, grid_size: int = 8) -> Game:
-    """Create a new game in PENDING status with creator as White player."""
+async def get_or_create_ai_user(db: AsyncSession) -> User:
+    """Find the system AI user, or register it if not exists."""
+    result = await db.execute(select(User).where(User.username == "AI"))
+    ai_user = result.scalar_one_or_none()
+    if not ai_user:
+        from app.core.security import hash_password
+
+        hashed = hash_password("ai_bot_dummy_password")
+        ai_user = User(username="AI", hashed_password=hashed)
+        db.add(ai_user)
+        await db.flush()
+        await db.commit()
+    return ai_user
+
+
+async def create_game(
+    db: AsyncSession, creator_id: int, grid_size: int = 8, vs_ai: bool = False
+) -> Game:
+    """Create a new game in PENDING status (or ACTIVE if vs_ai) with creator as White player."""
     if grid_size < 4 or grid_size > 26:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Grid size must be between 4 and 26.",
         )
-    game = Game(
-        player_white_id=creator_id,
-        grid_size=grid_size,
-        status="PENDING",
-        current_turn="WHITE",
-    )
+    if vs_ai:
+        ai_user = await get_or_create_ai_user(db)
+        game = Game(
+            player_white_id=creator_id,
+            player_black_id=ai_user.id,
+            grid_size=grid_size,
+            status="ACTIVE",
+            current_turn="WHITE",
+        )
+    else:
+        game = Game(
+            player_white_id=creator_id,
+            grid_size=grid_size,
+            status="PENDING",
+            current_turn="WHITE",
+        )
     game.moves = []
     db.add(game)
     await db.flush()
@@ -204,16 +234,10 @@ async def join_game(db: AsyncSession, game_id: int, user_id: int) -> Game:
     return game
 
 
-async def make_move(
-    db: AsyncSession, game_id: int, user_id: int, from_cell: str, to_cell: str
+async def make_move_internal(
+    db: AsyncSession, game: Game, user_id: int, from_cell: str, to_cell: str
 ) -> Game:
-    """Execute a move, update game turn, check for winner, and commit."""
-    game = await get_game(db, game_id)
-    if not game:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Game not found.",
-        )
+    """Internal helper to execute a move, update game turn, check for winner, and commit."""
     if game.status != "ACTIVE":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -270,3 +294,162 @@ async def make_move(
 
     game.board_state = board.board
     return game
+
+
+async def make_move(
+    db: AsyncSession, game_id: int, user_id: int, from_cell: str, to_cell: str
+) -> Game:
+    """Execute a move, update game turn, check for winner, commit, and trigger AI if opponent is AI."""
+    game = await get_game(db, game_id)
+    if not game:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Game not found.",
+        )
+
+    # coup humain
+    game = await make_move_internal(db, game, user_id, from_cell, to_cell)
+
+    if game.status == "ACTIVE":
+        next_player_id = (
+            game.player_black_id
+            if game.current_turn == "BLACK"
+            else game.player_white_id
+        )
+        if next_player_id:
+            ai_user = await get_or_create_ai_user(db)
+            if next_player_id == ai_user.id:
+                asyncio.create_task(trigger_ai_move_background(game.id))
+
+    return game
+
+
+def get_proutfish_path() -> str:
+    """Find the path to the proutfish binary."""
+    if os.path.exists("/ai_bot/proutfish"):
+        return "/ai_bot/proutfish"
+    local_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "ai_bot", "proutfish")
+    )
+    if os.path.exists(local_path):
+        return local_path
+    return "ai_bot/proutfish"
+
+
+async def run_ai_bot(board_str: str, player_num: str, depth_str: str) -> str:
+    """Run the AI bot asynchronously using a non-blocking subprocess."""
+    proutfish_path = get_proutfish_path()
+    proc = await asyncio.create_subprocess_exec(
+        proutfish_path,
+        board_str,
+        player_num,
+        depth_str,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"AI bot failed with exit code {proc.returncode}: {stderr.decode()}"
+        )
+    return stdout.decode()
+
+
+async def execute_ai_move(db: AsyncSession, game: Game, ai_user: User) -> Game:
+    """Evaluate board state, invoke the C++ AI bot, parse its move, and play it."""
+    board_state = reconstruct_board_state(game)
+    board_str = ""
+    for r in range(game.grid_size):
+        for c in range(game.grid_size):
+            cell = board_state[r][c]
+            if cell is None:
+                board_str += "0"
+            elif cell == "WHITE":
+                board_str += "1"
+            elif cell == "BLACK":
+                board_str += "2"
+        board_str += ";"
+
+    ai_color = "BLACK" if game.player_black_id == ai_user.id else "WHITE"
+    player_num = "2" if ai_color == "BLACK" else "1"
+    depth_str = "3"
+
+    try:
+        stdout = await run_ai_bot(board_str, player_num, depth_str)
+        move_str = stdout.strip()
+        if not move_str:
+            raise ValueError("AI bot returned empty output")
+
+        parts = [p for p in move_str.split(";") if p]
+        if len(parts) < 2:
+            raise ValueError(f"AI bot returned invalid move format: {move_str}")
+
+        from_cpp = parts[0]
+        to_cpp = parts[1]
+
+        from_row = ord(from_cpp[0].upper()) - ord("A")
+        from_col = int(from_cpp[1:]) - 1
+
+        to_row = ord(to_cpp[0].upper()) - ord("A")
+        to_col = int(to_cpp[1:]) - 1
+
+        board = BreakthroughBoard(grid_size=game.grid_size)
+        from_cell = board.coords_to_cell(from_row, from_col)
+        to_cell = board.coords_to_cell(to_row, to_col)
+
+        game = await make_move_internal(
+            db,
+            game=game,
+            user_id=ai_user.id,
+            from_cell=from_cell,
+            to_cell=to_cell,
+        )
+    except Exception as e:
+        print(f"AI Bot error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AI opponent failed to compute move: {str(e)}",
+        )
+
+    return game
+
+
+async def trigger_ai_move_background(game_id: int) -> None:
+    """Background task to load the game, execute AI move, and broadcast the update."""
+    await asyncio.sleep(0.5)
+
+    async with SessionLocal() as db:
+        game = await get_game(db, game_id)
+        if not game or game.status != "ACTIVE":
+            return
+
+        next_player_id = (
+            game.player_black_id
+            if game.current_turn == "BLACK"
+            else game.player_white_id
+        )
+        if not next_player_id:
+            return
+
+        ai_user = await get_or_create_ai_user(db)
+        if next_player_id != ai_user.id:
+            return
+
+        game = await execute_ai_move(db, game, ai_user)
+
+        from app.schemas.game import GameResponse
+        from app.services.connection_manager import manager
+
+        try:
+            serialized = GameResponse.model_validate(game).model_dump(mode="json")
+        except AttributeError:
+            serialized = GameResponse.from_orm(game).dict()
+
+        await manager.broadcast_to_game(
+            game_id=game.id,
+            message={
+                "type": "game_update",
+                "event": "move_played",
+                "game": serialized,
+            },
+        )
