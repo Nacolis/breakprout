@@ -1,6 +1,6 @@
-const API_BASE_URL = "http://localhost:8000/api/v1";
+import { API_BASE_URL, ApiError, parseErrorDetail } from "../apiClient";
 
-export class ApiError extends Error {}
+export { ApiError };
 
 export async function register(username: string, password: string): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -9,8 +9,7 @@ export async function register(username: string, password: string): Promise<void
     body: JSON.stringify({ username, password }),
   });
   if (!res.ok) {
-    const data = await res.json().catch(() => null);
-    throw new ApiError(data?.detail ?? "Échec de l'inscription");
+    throw new ApiError(await parseErrorDetail(res, "Échec de l'inscription"));
   }
 }
 
@@ -21,8 +20,7 @@ export async function login(username: string, password: string): Promise<string>
     body: new URLSearchParams({ username, password }),
   });
   if (!res.ok) {
-    const data = await res.json().catch(() => null);
-    throw new ApiError(data?.detail ?? "Échec de la connexion");
+    throw new ApiError(await parseErrorDetail(res, "Échec de la connexion"));
   }
   const data = await res.json();
   return data.access_token as string;

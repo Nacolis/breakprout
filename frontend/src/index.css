@@ -1,98 +1,22 @@
-* {
-  box-sizing: border-box;
-}
+@import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  color: #e2e2f0;
-  display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-card {
-  width: 320px;
-  padding: 2rem;
-  border-radius: 12px;
-  background: #898989;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.auth-card h1 {
-  margin: 0 0 1.5rem;
-  text-align: center;
-  font-size: 1.5rem;
-}
-
-.auth-tabs {
-  display: flex;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #2E2E2E
-}
-
-.auth-tabs button {
-  flex: 1;
-  padding: 0.5rem;
-  background: transparent;
-  color: #e2e2f0;
-  border: none;
-  cursor: pointer;
-}
-
-.auth-tabs button.active {
-  background: #5865f2;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-}
-
-input {
-  padding: 0.5rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #2E2E2E;
-  background: #1e1e2e;
-  color: #e2e2f0;
-  font-size: 1rem;
-}
-
-form > button {
-  margin-top: 0.5rem;
-  padding: 0.6rem;
-  border-radius: 6px;
-  border: none;
-  background: #5865f2;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-form > button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.auth-error {
-  color: #f87171;
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.auth-info {
-  color: #4ade80;
-  font-size: 0.85rem;
-  margin: 0;
+@theme {
+  --color-ink: #e2e2f0;
+  --color-card: #898989;
+  --color-surface: #1e1e2e;
+  --color-surface-2: #2a2a3d;
+  --color-edge: #2e2e2e;
+  --color-brand: #5865f2;
+  --color-status-pending: #facc15;
+  --color-status-active: #4ade80;
+  --color-status-finished: #94a3b8;
+  --color-error: #f87171;
+  --color-board-light: #4a4a63;
+  --color-board-dark: #34344a;
+  --color-piece-white: #f4f4f8;
+  --color-piece-white-edge: #cfcfe0;
+  --color-piece-black: #18181f;
+  --color-piece-black-edge: #3a3a4a;
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
