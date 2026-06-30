@@ -1,20 +1,41 @@
 import { useState } from "react";
 import AuthForm from "./auth/AuthForm";
+import Lobby from "./lobby/Lobby";
+import GameScreen from "./game/GameScreen";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [gameId, setGameId] = useState<number | null>(null);
 
-  if (token) {
+  function handleAuthenticated(newToken: string, newUsername: string) {
+    setToken(newToken);
+    setUsername(newUsername);
+  }
+
+  if (!token || !username) {
+    return <AuthForm onAuthenticated={handleAuthenticated} />;
+  }
+
+  if (gameId !== null) {
     return (
-      <div className="auth-card">
-        <h1>Connecté</h1>
-        <p>Token JWT reçu.</p>
-        <button type="button" onClick={() => setToken(null)}>
-          Se déconnecter
-        </button>
-      </div>
+      <GameScreen
+        gameId={gameId}
+        token={token}
+        username={username}
+        onBack={() => setGameId(null)}
+      />
     );
   }
 
-  return <AuthForm onAuthenticated={setToken} />;
+  return (
+    <Lobby
+      token={token}
+      onLogout={() => {
+        setToken(null);
+        setUsername(null);
+      }}
+      onOpenGame={setGameId}
+    />
+  );
 }

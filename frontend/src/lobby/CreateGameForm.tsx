@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { register, ApiError } from "./api";
+import { createGame, ApiError, type Game } from "./api";
 
-interface RegisterFormProps {
-  onRegistered: () => void;
+interface CreateGameFormProps {
+  token: string;
+  onCreated: (game: Game) => void;
 }
 
-export default function RegisterForm({ onRegistered }: RegisterFormProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export default function CreateGameForm({ token, onCreated }: CreateGameFormProps) {
+  const [gridSize, setGridSize] = useState(8);
+  const [vsAi, setVsAi] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -16,9 +17,8 @@ export default function RegisterForm({ onRegistered }: RegisterFormProps) {
     setError(null);
     setLoading(true);
     try {
-      await register(username, password);
-      console.log("Inscription réussie:", username, password);
-      onRegistered();
+      const game = await createGame(token, { grid_size: gridSize, vs_ai: vsAi });
+      onCreated(game);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Une erreur est survenue.");
     } finally {
@@ -29,25 +29,23 @@ export default function RegisterForm({ onRegistered }: RegisterFormProps) {
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <label className="flex flex-col gap-1.5 text-sm">
-        Nom d'utilisateur
+        Taille de la grille
         <input
           className="rounded-md border border-edge bg-surface p-2 text-base text-ink"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          minLength={1}
+          type="number"
+          min={4}
+          max={26}
+          value={gridSize}
+          onChange={(e) => setGridSize(Number(e.target.value))}
         />
       </label>
-      <label className="flex flex-col gap-1.5 text-sm">
-        Mot de passe
+      <label className="flex flex-row items-center gap-2 text-sm">
         <input
-          className="rounded-md border border-edge bg-surface p-2 text-base text-ink"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={1}
+          type="checkbox"
+          checked={vsAi}
+          onChange={(e) => setVsAi(e.target.checked)}
         />
+        Jouer contre l'IA
       </label>
 
       {error && <p className="m-0 text-sm text-error">{error}</p>}
@@ -57,7 +55,7 @@ export default function RegisterForm({ onRegistered }: RegisterFormProps) {
         disabled={loading}
         className="mt-2 cursor-pointer rounded-md bg-brand p-2.5 font-semibold text-white disabled:cursor-default disabled:opacity-60"
       >
-        {loading ? "..." : "Créer le compte"}
+        {loading ? "..." : "Créer une partie"}
       </button>
     </form>
   );
