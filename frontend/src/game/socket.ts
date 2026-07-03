@@ -1,6 +1,11 @@
 import type { Game } from "../lobby/api";
 
-const WS_BASE_URL = "ws://localhost:8000/api/v1/ws";
+const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const defaultWsUrl = window.location.host.includes("5173")
+  ? "ws://localhost:8000/api/v1/ws"
+  : `${wsProtocol}//${window.location.host}/api/v1/ws`;
+
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL ?? defaultWsUrl;
 
 export interface SyncMessage {
   type: "sync";
