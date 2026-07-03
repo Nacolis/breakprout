@@ -43,7 +43,7 @@ export default function Lobby({ token, onLogout, onOpenGame }: LobbyProps) {
 
   const ongoing = games.filter((g) => g.status === "PENDING" || g.status === "ACTIVE");
   const history = games.filter((g) => g.status === "FINISHED");
-  const filteredOngoing = ongoing.filter((g) => {
+  const searchOngoing = ongoing.filter((g) => {
       if (search)
         return g.id.toString().includes(search.trim());
       return true;
@@ -87,7 +87,7 @@ export default function Lobby({ token, onLogout, onOpenGame }: LobbyProps) {
                   value={search}
                   onSearch={setSearch}
                 />
-              {filteredOngoing.map((g) => (
+              {searchOngoing.map((g) => (
                 <GameCard
                   key={g.id}
                   game={g}
