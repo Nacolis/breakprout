@@ -4,6 +4,7 @@ import GameCard from "./GameCard";
 import CreateGameForm from "./CreateGameForm";
 import FriendsPlaceholder from "./FriendsPlaceholder";
 import { decodeJwtUserId } from "../jwt";
+import SearchBar from "./SearchBar";
 
 interface LobbyProps {
   token: string;
@@ -14,6 +15,7 @@ interface LobbyProps {
 export default function Lobby({ token, onLogout, onOpenGame }: LobbyProps) {
   const [games, setGames] = useState<Game[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("")
   const myUserId = decodeJwtUserId(token);
 
   const refresh = useCallback(async () => {
@@ -41,6 +43,12 @@ export default function Lobby({ token, onLogout, onOpenGame }: LobbyProps) {
 
   const ongoing = games.filter((g) => g.status === "PENDING" || g.status === "ACTIVE");
   const history = games.filter((g) => g.status === "FINISHED");
+  const searchOngoing = ongoing.filter((g) => {
+      if (search)
+        return g.id.toString().includes(search.trim());
+      return true;
+    }
+  );
 
   return (
     <div className="w-[min(960px,92vw)] py-8">
@@ -75,7 +83,11 @@ export default function Lobby({ token, onLogout, onOpenGame }: LobbyProps) {
             <p>Aucune partie en cours.</p>
           ) : (
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {ongoing.map((g) => (
+                <SearchBar
+                  value={search}
+                  onSearch={setSearch}
+                />
+              {searchOngoing.map((g) => (
                 <GameCard
                   key={g.id}
                   game={g}
