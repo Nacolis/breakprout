@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.models.base import Base
 from app.models.user import User  # noqa: F401
 from app.models.game import Game, Move  # noqa: F401
+from app.models.friendship import Friendship  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -11,6 +12,21 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
+    level: int
+    avatar_path: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+
+
+class UserWithStatusResponse(UserResponse):
+    online: bool
+
+
+class FriendAddRequest(BaseModel):
+    username: str
+
