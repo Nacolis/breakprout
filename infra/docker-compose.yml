@@ -16,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - breakprout_net
 
   server:
     build:
@@ -23,8 +25,8 @@ services:
       dockerfile: Dockerfile
     container_name: breakprout_server
     restart: always
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/breakprout
       - SECRET_KEY=supersecretkeyforlocaldevelopmentbreakproutgameserver
@@ -32,6 +34,52 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ../server:/app
+      - server_venv:/app/.venv
+    networks:
+      - breakprout_net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=/api/v1
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - breakprout_net
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: on-failure           # retry when frontend DNS isn't ready yet
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      frontend:
+        condition: service_started
+      server:
+        condition: service_started
+    networks:
+      - breakprout_net
 
 volumes:
   postgres_data:
+    driver: local
+  server_venv:
+    driver: local
+
+networks:
+  breakprout_net:
+    driver: bridge
