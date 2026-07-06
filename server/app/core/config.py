@@ -17,5 +17,10 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
 
+    FOURTYTWO_CLIENT_ID: str = ""
+    FOURTYTWO_CLIENT_SECRET: str = ""
+    FOURTYTWO_REDIRECT_URI: str = "https://localhost/api/v1/auth/42/callback"
+
 
 settings = Settings()
+

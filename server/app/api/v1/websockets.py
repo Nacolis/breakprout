@@ -21,13 +21,19 @@ async def websocket_endpoint(
 ) -> None:
     """WebSocket endpoint for real-time game play and chat with JWT authentication."""
     # 1. Authenticate connection
-    if not token:
+    resolved_token = token
+    if not resolved_token or resolved_token.startswith("cookie_auth"):
+        resolved_token = websocket.cookies.get("access_token")
+    if not resolved_token:
         await websocket.close(
             code=status.WS_1008_POLICY_VIOLATION, reason="Missing token"
         )
         return
 
-    payload = decode_access_token(token)
+
+    payload = decode_access_token(resolved_token)
+
+
     if not payload:
         await websocket.close(
             code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token"
