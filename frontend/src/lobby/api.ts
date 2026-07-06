@@ -10,6 +10,7 @@ export interface Game {
   status: "PENDING" | "ACTIVE" | "FINISHED";
   winner_id: number | null;
   grid_size: number;
+  ai_depth: number;
   created_at: string;
   updated_at: string;
   board_state?: (string | null)[][] | null;
@@ -43,7 +44,7 @@ export async function joinGame(token: string, gameId: number): Promise<Game> {
 
 export async function createGame(
   token: string,
-  options: { grid_size?: number; vs_ai?: boolean },
+  options: { grid_size?: number; vs_ai?: boolean; ai_depth?: number },
 ): Promise<Game> {
   const res = await fetch(`${API_BASE_URL}/games/`, {
     method: "POST",

@@ -24,6 +24,7 @@ class MoveResponse(BaseModel):
 class GameCreate(BaseModel):
     grid_size: Optional[int] = 8
     vs_ai: Optional[bool] = False
+    ai_depth: Optional[int] = 3
 
 
 class GameResponse(BaseModel):
@@ -34,6 +35,7 @@ class GameResponse(BaseModel):
     status: str
     winner_id: Optional[int]
     grid_size: int
+    ai_depth: int
     created_at: datetime
     updated_at: datetime
     moves: list[MoveResponse]

@@ -28,6 +28,7 @@ class Game(Base):
         Integer, ForeignKey("users.id"), nullable=True
     )
     grid_size: Mapped[int] = mapped_column(Integer, nullable=False, default=8)
+    ai_depth: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=func.now()
     )

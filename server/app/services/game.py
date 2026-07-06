@@ -174,13 +174,22 @@ async def get_or_create_ai_user(db: AsyncSession) -> User:
 
 
 async def create_game(
-    db: AsyncSession, creator_id: int, grid_size: int = 8, vs_ai: bool = False
+    db: AsyncSession,
+    creator_id: int,
+    grid_size: int = 8,
+    vs_ai: bool = False,
+    ai_depth: int = 3,
 ) -> Game:
     """Create a new game in PENDING status (or ACTIVE if vs_ai) with creator as White player."""
     if grid_size < 4 or grid_size > 26:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Grid size must be between 4 and 26.",
+        )
+    if ai_depth < 1 or ai_depth > 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="AI depth must be between 1 and 6.",
         )
     if vs_ai:
         ai_user = await get_or_create_ai_user(db)
@@ -190,6 +199,7 @@ async def create_game(
             grid_size=grid_size,
             status="ACTIVE",
             current_turn="WHITE",
+            ai_depth=ai_depth,
         )
     else:
         game = Game(
@@ -372,7 +382,7 @@ async def execute_ai_move(db: AsyncSession, game: Game, ai_user: User) -> Game:
 
     ai_color = "BLACK" if game.player_black_id == ai_user.id else "WHITE"
     player_num = "2" if ai_color == "BLACK" else "1"
-    depth_str = "3"
+    depth_str = str(game.ai_depth)
 
     try:
         stdout = await run_ai_bot(board_str, player_num, depth_str)
