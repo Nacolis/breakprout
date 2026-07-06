@@ -90,3 +90,4 @@ build/
 dist/
 web/index.html
 server/ai_bot/proutfish
+server/static
