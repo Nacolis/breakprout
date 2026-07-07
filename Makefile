@@ -20,9 +20,6 @@ all: $(NAME)
 $(NAME):
 	@printf "$(BLUE)Building images and Starting containers...$(RESET)\n"
 	@$(COMPOSE) up --build -d
-	
-	@printf "$(BLUE)Updating database tables...$(RESET)\n"
-	docker exec -t breakprout_server alembic upgrade head
 	@printf "$(GREEN)Breakprout Ready ✔$(RESET)\n"
 
 dev:

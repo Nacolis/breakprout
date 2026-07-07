@@ -44,7 +44,12 @@ COPY --from=ai_builder /usr/src/ai_bot/proutfish /ai_bot/proutfish
 # Prepend the virtual environment binaries to the PATH so that uvicorn/alembic run inside the virtualenv
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Make entrypoint script executable and configure it
+RUN chmod +x /app/docker-entrypoint.sh
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+
 EXPOSE 8000
 
 # Start FastAPI application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
