@@ -43,7 +43,7 @@ export default function Home({
   const [toasts, setToasts] = useState<{ id: number; message: string }[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const knownFriendIds = useRef<Set<number> | null>(null);
-  const { onlineStatus, messages, sendMessage, error: chatError } = useGlobalSocket(token);
+  const { onlineStatus, messages, sendMessage, error: chatError, syncOnlineStatus } = useGlobalSocket(token);
 
   useEffect(() => {
     knownFriendIds.current = null;
@@ -53,6 +53,7 @@ export default function Home({
       try {
         const friends = await listFriends(token!);
         setFriends(friends);
+        syncOnlineStatus(Object.fromEntries(friends.map((f) => [f.id, f.online])));
         const ids = new Set(friends.map((f) => f.id));
         if (knownFriendIds.current) {
           for (const friend of friends) {
