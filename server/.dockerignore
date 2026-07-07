@@ -5,6 +5,4 @@ __pycache__
 .env
 .env.example
 .python-version
-alembic.ini
-migrations/versions/*
 *.db
