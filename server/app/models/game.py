@@ -47,6 +47,15 @@ class Game(Base):
         order_by="Move.move_number",
     )
 
+    @property
+    def player_white_mmr(self) -> Optional[int]:
+        return self.player_white.mmr if self.player_white else None
+
+    @property
+    def player_black_mmr(self) -> Optional[int]:
+        return self.player_black.mmr if self.player_black else None
+
+
 
 class Move(Base):
     """Move database model storing each played move to reconstruct history."""

@@ -15,8 +15,9 @@ class User(Base):
     )
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     level: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    avatar_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    mmr: Mapped[int] = mapped_column(Integer, nullable=False, default=1500)
     intra_id: Mapped[Optional[int]] = mapped_column(
         Integer, unique=True, index=True, nullable=True
     )
+    avatar_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 

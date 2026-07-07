@@ -14,6 +14,8 @@ export interface Game {
   created_at: string;
   updated_at: string;
   board_state?: (string | null)[][] | null;
+  player_white_mmr?: number;
+  player_black_mmr?: number;
 }
 
 function authHeaders(token: string): HeadersInit {
@@ -53,6 +55,21 @@ export async function createGame(
   });
   if (!res.ok) {
     throw new ApiError(await parseErrorDetail(res, "Impossible de créer la partie"));
+  }
+  return res.json();
+}
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  mmr: number;
+  avatar_path?: string;
+}
+
+export async function getUser(token: string, userId: number): Promise<UserResponse> {
+  const res = await fetch(`${API_BASE_URL}/users/${userId}`, { headers: authHeaders(token) });
+  if (!res.ok) {
+    throw new ApiError(await parseErrorDetail(res, "Impossible de récupérer l'utilisateur"));
   }
   return res.json();
 }

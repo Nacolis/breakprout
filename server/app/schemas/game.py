@@ -31,6 +31,8 @@ class GameResponse(BaseModel):
     id: int
     player_white_id: Optional[int]
     player_black_id: Optional[int]
+    player_white_mmr: Optional[int] = None
+    player_black_mmr: Optional[int] = None
     current_turn: str
     status: str
     winner_id: Optional[int]
