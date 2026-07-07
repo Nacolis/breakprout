@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { createGame, ApiError, type Game } from "./api";
 
+const AI_DIFFICULTIES = [
+  { label: "Facile", depth: 2 },
+  { label: "Moyen", depth: 4 },
+  { label: "Difficile", depth: 6 },
+];
+
 interface CreateGameFormProps {
   token: string;
   onCreated: (game: Game) => void;
@@ -9,6 +15,7 @@ interface CreateGameFormProps {
 export default function CreateGameForm({ token, onCreated }: CreateGameFormProps) {
   const [gridSize, setGridSize] = useState(8);
   const [vsAi, setVsAi] = useState(false);
+  const [aiDepth, setAiDepth] = useState(AI_DIFFICULTIES[1].depth);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +24,11 @@ export default function CreateGameForm({ token, onCreated }: CreateGameFormProps
     setError(null);
     setLoading(true);
     try {
-      const game = await createGame(token, { grid_size: gridSize, vs_ai: vsAi });
+      const game = await createGame(token, {
+        grid_size: gridSize,
+        vs_ai: vsAi,
+        ai_depth: aiDepth,
+      });
       onCreated(game);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Une erreur est survenue.");
@@ -47,6 +58,23 @@ export default function CreateGameForm({ token, onCreated }: CreateGameFormProps
         />
         Jouer contre l'IA
       </label>
+
+      {vsAi && (
+        <label className="flex flex-col gap-1.5 text-sm">
+          Difficulté de l'IA
+          <select
+            className="rounded-md border border-edge bg-surface p-2 text-base text-ink"
+            value={aiDepth}
+            onChange={(e) => setAiDepth(Number(e.target.value))}
+          >
+            {AI_DIFFICULTIES.map(({ label, depth }) => (
+              <option key={depth} value={depth}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {error && <p className="m-0 text-sm text-error">{error}</p>}
 

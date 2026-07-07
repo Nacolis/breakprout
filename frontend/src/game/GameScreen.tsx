@@ -79,7 +79,7 @@ export default function GameScreen({ gameId, token, username, onBack }: GameScre
   }
 
   return (
-    <div className="w-[min(960px,92vw)] py-8">
+    <div className="mx-auto w-[min(960px,92vw)] py-8">
       <header className="mb-6 flex items-center justify-between">
         <h1 className="m-0 text-2xl font-bold">Partie #{gameId}</h1>
         <button

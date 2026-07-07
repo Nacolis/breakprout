@@ -26,7 +26,11 @@ async def create_new_game(
 ) -> GameResponse:
     """Create a new Breakthrough game."""
     game = await game_service.create_game(
-        db, creator_id=current_user.id, grid_size=game_in.grid_size, vs_ai=game_in.vs_ai
+        db,
+        creator_id=current_user.id,
+        grid_size=game_in.grid_size,
+        vs_ai=game_in.vs_ai,
+        ai_depth=game_in.ai_depth,
     )
     return game
 

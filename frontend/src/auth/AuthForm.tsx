@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import { API_BASE_URL } from "../apiClient";
 
 type Mode = "login" | "register";
 
@@ -50,6 +51,19 @@ export default function AuthForm({ onAuthenticated }: AuthFormProps) {
           }}
         />
       )}
+
+      <div className="my-4 flex items-center gap-3 text-xs text-status-finished">
+        <span className="h-px flex-1 bg-edge" />
+        ou
+        <span className="h-px flex-1 bg-edge" />
+      </div>
+
+      <a
+        href={`${API_BASE_URL}/auth/42/login`}
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-edge bg-transparent p-2.5 font-semibold text-ink"
+      >
+        Se connecter avec 42
+      </a>
     </div>
   );
 }

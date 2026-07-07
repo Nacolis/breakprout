@@ -7,7 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user, get_db
 from app.models.user import User
 from app.models.friendship import Friendship
-from app.schemas.user import UserResponse, UserUpdate, UserWithStatusResponse, FriendAddRequest
+from app.schemas.user import (
+    UserResponse,
+    UserUpdate,
+    UserWithStatusResponse,
+    FriendAddRequest,
+)
 from app.services.online_manager import online_manager
 
 router = APIRouter(prefix="/users", tags=["users"])

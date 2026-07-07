@@ -1,6 +1,5 @@
 import { useState } from "react";
-import AuthForm from "./auth/AuthForm";
-import Lobby from "./lobby/Lobby";
+import Home from "./Home";
 import GameScreen from "./game/GameScreen";
 
 export default function App() {
@@ -13,11 +12,7 @@ export default function App() {
     setUsername(newUsername);
   }
 
-  if (!token || !username) {
-    return <AuthForm onAuthenticated={handleAuthenticated} />;
-  }
-
-  if (gameId !== null) {
+  if (gameId !== null && token && username) {
     return (
       <GameScreen
         gameId={gameId}
@@ -29,13 +24,16 @@ export default function App() {
   }
 
   return (
-    <Lobby
+    <Home
       token={token}
+      username={username}
+      onAuthenticated={handleAuthenticated}
       onLogout={() => {
         setToken(null);
         setUsername(null);
       }}
       onOpenGame={setGameId}
+      onUsernameChange={setUsername}
     />
   );
 }
