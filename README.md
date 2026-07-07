@@ -2,11 +2,11 @@
 
 # Description
 
-Breakprout is a web application based on the Breakthrough game, which lets users play against users (leading to a leaderboard with ELO system) or an AI. This project is developed as part of the 42 curriculum as ft_transcendence project. The goal of this project is to build an entire application of our choice by ourselves, that requires a frontend, a backend and a database.
+Breakprout is a web application based on the Breakthrough game, which lets users play against users with ELO system or an AI. This project is developed as part of the 42 curriculum as ft_transcendence project. The goal of this project is to build an entire application of our choice by ourselves, that requires a frontend, a backend and a database.
 
 # Team Information
 
-* **Technical Lead** - `rdomange`
+* **Technical Lead** - `niroy`
 	- Defines technical architecture.
 	- Makes technology stack decisions.
 	- Ensures code quality and best practices.
@@ -24,7 +24,7 @@ Breakprout is a web application based on the Breakthrough game, which lets users
 	- Validates completed work.
 	- Communicates with stakeholders (evaluators, peers).
 
-* **Developer** - `niroy`
+* **Developer** - `rdomange` 
 	- Write code for assigned features.
 	- Participate in code reviews.
 	- Test their implementations.
@@ -74,19 +74,21 @@ Breakprout is a web application based on the Breakthrough game, which lets users
 This project uses a relational database composed of three main tables: users, games, and moves.
 It models a turn-based game system where users play matches and each move is recorded.
 
-* **Users Table** :
-```
+ **Users Table** :
 | Column          | Type    | Constraints     | Description                |
 | --------------- | ------- | --------------- | -------------------------- |
 | id              | Integer | Primary Key     | Unique user identifier     |
 | username        | String  | Unique, indexed | Login / display name       |
 | hashed_password | String  | Not null        | Secure password hash       |
-| level           | Integer | Not null        | Player progression or rank |
-```
+| mmr           | Integer | Not null        | Player progression or rank |
+| avatar_path | String | | Store path of player avatar | 
+| intra_id | Integer | | Store intra id from oauth | 
+
+
+
 ---
 
-* **Games table** :
-```
+**Games table** :
 | Column          | Type     | Constraints              | Description                         |
 | --------------- | -------- | ------------------------ | ----------------------------------- |
 | id              | Integer  | Primary Key              | Unique game identifier              |
@@ -98,12 +100,9 @@ It models a turn-based game system where users play matches and each move is rec
 | grid_size       | Integer  | Not null                 | Board size                          |
 | created_at      | DateTime | Not null                 | Game creation timestamp             |
 | updated_at      | DateTime | Not null                 | Last update timestamp               |
-```
 
 ---
-
-* **Moves table** :
-```
+ **Moves table** :
 | Column      | Type     | Constraints     | Description                |
 | ----------- | -------- | --------------- | -------------------------- |
 | id          | Integer  | Primary Key     | Unique move identifier     |
@@ -113,7 +112,6 @@ It models a turn-based game system where users play matches and each move is rec
 | from_cell   | String   | Not null        | Starting position          |
 | to_cell     | String   | Not null        | Destination position       |
 | played_at   | DateTime | Not null        | Timestamp of the move      |
-```
 
 ---
 
@@ -133,8 +131,11 @@ It models a turn-based game system where users play matches and each move is rec
 * AI bot
 	- Minimax algorithm with alpha/beta pruning optimization
 
+* Game
+	- Able to reconnect to a game
+	- Show move possibilities
+
 * Game options
-	- Game themes
 	- Customizable grid size
 	- Different AI difficulties
 
@@ -145,7 +146,7 @@ It models a turn-based game system where users play matches and each move is rec
 	- Profile
 	- Spectator mode
 	- History
-	- Leaderboard
+	- MMR
 
 * Authentication
 	- Username / Password
@@ -159,7 +160,9 @@ It models a turn-based game system where users play matches and each move is rec
 
 * QOL
 	- Search bar for games
-	- UI themes
+	- Filter bar for games
+	- Responsiveness
+	- UI themes dark/light
 
 ---
 
@@ -194,7 +197,7 @@ Everything is adding up to 24 points.
 
 # Individual Contributions
 
-Individual contributions were shared across the team based on the project modules. `hugmonch` focused on the frontend and user experience, user interaction, authentication, notifications, design system, advanced search, browser support, game statistics, OAuth 2.0 integration, game customization, and spectator mode. `niroy` worked primarily on backend development, real-time communication with WebSockets, user interaction, authentication, remote multiplayer, ORM integration, collaborative features, and OAuth 2.0. `dkittaya` was responsible for developing the AI opponent and also contributed to the web-based game implementation and advanced search functionality. `rdomange` contributed to the core web-based game implementation and the game statistics and ranking module. Together, these contributions covered a total of 24 project points, exceeding the required 14 points for project validation.
+Individual contributions were shared across the team based on the project modules. `hugmonch` focused on the frontend and user experience, user interaction, authentication, notifications, design system, advanced search, browser support, game statistics, OAuth 2.0 integration, game customization, and spectator mode. `niroy` worked primarily on backend development, real-time communication with WebSockets, user interaction, authentication, remote multiplayer, ORM integration, collaborative features, and OAuth 2.0. `dkittaya` was responsible for developing the AI opponent and also contributed to the web-based game implementation and advanced search functionality. `rdomange` contributed to the core web-based game implementation, the game statistics , ranking module and nginx integration. Together, these contributions covered a total of 24 project points, exceeding the required 14 points for project validation.
 
 ---
 
@@ -235,7 +238,7 @@ Individual contributions were shared across the team based on the project module
 
 # Instructions
 
-## Requirements
+## (DEV) Requirements
 
 * Git
 * Make
@@ -243,6 +246,10 @@ Individual contributions were shared across the team based on the project module
 * Docker and Docker Compose
 * uv
 
+## Requirements
+
+* Git
+* Docker and Docker Compose
 ---
 
 ## Installation
@@ -250,10 +257,10 @@ Individual contributions were shared across the team based on the project module
 * Clone project :
 
 ```
-git clone https://github.com/Nacolis/breakprout breakprout
+git clone https://github.com/Nacolis/breakprout
 ```
 
-* Create an `.env`file as follow or use the `.env.exemple` file :
+* Create an `.env`file as follow in breakprout/server/.env or use the `.env.exemple` file :
 
 ```
 # App Configuration
