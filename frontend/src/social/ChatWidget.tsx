@@ -82,7 +82,7 @@ export default function ChatWidget({ friends, onlineStatus, messages, onSend, er
             <p className="m-0 text-xs text-status-finished">Choisis un ami pour discuter.</p>
           ) : (
             <>
-              <ul className="m-0 mb-2 flex flex-1 list-none flex-col gap-1.5 overflow-y-auto p-0">
+              <ul className="m-0 mb-2 flex flex-1 list-none flex-col justify-end gap-1.5 overflow-y-auto p-0">
                 {thread.map((m, i) => (
                   <li
                     key={i}
