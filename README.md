@@ -134,6 +134,7 @@ It models a turn-based game system where users play matches and each move is rec
 * Game options
 	- Game themes
 	- Customizable grid size
+	- Different AI difficulties
 
 * User interaction
 	- Friends
@@ -241,6 +242,34 @@ Individual contributions were shared across the team based on the project module
 * uv
 
 ---
+
+## Installation
+
+* Clone project :
+
+```
+git clone https://github.com/Nacolis/breakprout breakprout
+```
+
+* Create an `.env`file as follow or use the `.env.exemple` file :
+
+```
+# App Configuration
+PROJECT_NAME="Breakprout Server"
+DEBUG=true
+API_V1_STR="/api/v1"
+
+# Security
+SECRET_KEY="change_me_to_something_very_secret_and_secure"
+ACCESS_TOKEN_EXPIRE_MINUTES=11520  # 8 days
+
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@db:5432/breakprout"
+
+# 42 OAuth Credentials
+FOURTYTWO_CLIENT_ID="your_42_client_id"
+FOURTYTWO_CLIENT_SECRET="your_42_client_secret"
+FOURTYTWO_REDIRECT_URI="https://localhost/api/v1/auth/42/callback"
+```
 
 ## Running the application
 
