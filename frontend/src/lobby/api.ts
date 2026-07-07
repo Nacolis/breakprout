@@ -14,6 +14,8 @@ export interface Game {
   created_at: string;
   updated_at: string;
   board_state?: (string | null)[][] | null;
+  player_white_mmr?: number;
+  player_black_mmr?: number;
 }
 
 function authHeaders(token: string): HeadersInit {

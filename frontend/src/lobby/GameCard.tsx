@@ -15,8 +15,6 @@ const STATUS_COLORS: Record<Game["status"], string> = {
 interface GameCardProps {
   game: Game;
   myUserId: number | null;
-  playerWhiteMmr?: number;
-  playerBlackMmr?: number;
   onOpen: () => void;
   onJoin: () => void;
 }
@@ -24,11 +22,10 @@ interface GameCardProps {
 export default function GameCard({
   game,
   myUserId,
-  playerWhiteMmr,
-  playerBlackMmr,
   onOpen,
   onJoin,
 }: GameCardProps) {
+
   const isMine =
     game.player_white_id === myUserId || game.player_black_id === myUserId;
   const isJoinable = game.status === "PENDING" && !isMine;
@@ -48,10 +45,10 @@ export default function GameCard({
       </button>
       <div className="flex flex-col text-xs gap-0.5">
         {game.player_white_id && (
-          <span className="mmr-badge">⚪ {playerWhiteMmr ?? "-"}</span>
+          <span className="mmr-badge">⚪ {game.player_white_mmr ?? "-"}</span>
         )}
         {game.player_black_id && (
-          <span className="mmr-badge">⚫ {playerBlackMmr ?? "-"}</span>
+          <span className="mmr-badge">⚫ {game.player_black_mmr ?? "-"}</span>
         )}
       </div>
     </li>

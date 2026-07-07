@@ -134,7 +134,11 @@ async def list_games(
     db: AsyncSession, status_filter: Optional[str] = None
 ) -> Sequence[Game]:
     """Retrieve all games with optional status filter."""
-    query = select(Game).options(selectinload(Game.moves))
+    query = select(Game).options(
+        selectinload(Game.moves),
+        selectinload(Game.player_white),
+        selectinload(Game.player_black),
+    )
     if status_filter:
         query = query.where(Game.status == status_filter)
     result = await db.execute(query)
@@ -149,7 +153,11 @@ async def get_game(db: AsyncSession, game_id: int) -> Optional[Game]:
     result = await db.execute(
         select(Game)
         .where(Game.id == game_id)
-        .options(selectinload(Game.moves))
+        .options(
+            selectinload(Game.moves),
+            selectinload(Game.player_white),
+            selectinload(Game.player_black),
+        )
         .execution_options(populate_existing=True)
     )
     game = result.scalar_one_or_none()
@@ -212,8 +220,12 @@ async def create_game(
     db.add(game)
     await db.flush()
     await db.commit()
-    game.board_state = BreakthroughBoard(grid_size=grid_size).board
-    return game
+    # Reload game to populate all relationships (e.g. player_white/black) and board state
+    db_game = await get_game(db, game.id)
+    if not db_game:
+        game.board_state = BreakthroughBoard(grid_size=grid_size).board
+        return game
+    return db_game
 
 
 async def join_game(db: AsyncSession, game_id: int, user_id: int) -> Game:
@@ -240,8 +252,14 @@ async def join_game(db: AsyncSession, game_id: int, user_id: int) -> Game:
     game.updated_at = datetime.now()
     await db.flush()
     await db.commit()
-    game.board_state = reconstruct_board_state(game)
-    return game
+    # Reload game to populate all relationships (e.g. player_white/black) and board state
+    db_game = await get_game(db, game_id)
+    if not db_game:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Game not found after join.",
+        )
+    return db_game
 
 
 async def make_move_internal(
@@ -332,8 +350,11 @@ async def make_move_internal(
     await db.flush()
     await db.commit()
 
-    game.board_state = board.board
-    return game
+    db_game = await get_game(db, game.id)
+    if not db_game:
+        game.board_state = board.board
+        return game
+    return db_game
 
 
 async def make_move(

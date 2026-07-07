@@ -19,4 +19,5 @@ class User(Base):
     intra_id: Mapped[Optional[int]] = mapped_column(
         Integer, unique=True, index=True, nullable=True
     )
+    avatar_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
