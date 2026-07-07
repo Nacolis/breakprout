@@ -12,7 +12,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
-    level: int
+    mmr: int
     avatar_path: Optional[str] = None
 
     class Config:

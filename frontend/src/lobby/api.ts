@@ -56,3 +56,18 @@ export async function createGame(
   }
   return res.json();
 }
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  mmr: number;
+  avatar_path?: string;
+}
+
+export async function getUser(token: string, userId: number): Promise<UserResponse> {
+  const res = await fetch(`${API_BASE_URL}/users/${userId}`, { headers: authHeaders(token) });
+  if (!res.ok) {
+    throw new ApiError(await parseErrorDetail(res, "Impossible de récupérer l'utilisateur"));
+  }
+  return res.json();
+}

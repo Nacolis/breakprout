@@ -292,7 +292,37 @@ async def make_move_internal(
     board.make_move(player_color, from_cell, to_cell)
     winner = board.check_winner()
 
+    # --- MMR update logic (run after move, before commit) ---
+    async def _calculate_mmr_delta(winner_mmr: int, loser_mmr: int) -> int:
+        """Return point exchange based on the custom rule:
+        * Equal MMR → ±10 points
+        * Higher rated wins → smaller gain (ratio based)
+        * Lower rated wins → larger gain (clamped to 40)
+        """
+        if winner_mmr >= loser_mmr:
+            # higher or equal rating wins
+            delta = int(10 * (loser_mmr / winner_mmr))
+            return max(2, delta)  # at least 2 points exchange
+        else:
+            # lower rating wins – larger swing
+            delta = int(10 * (winner_mmr / loser_mmr))
+            return min(40, max(10, delta))
+
+    # Apply MMR changes if the game has concluded
     if winner:
+        # Determine winner and loser users
+        winner_user_id = user_id
+        loser_user_id = game.player_black_id if user_id == game.player_white_id else game.player_white_id
+        # Load both users
+        winner_res = await db.execute(select(User).where(User.id == winner_user_id))
+        loser_res = await db.execute(select(User).where(User.id == loser_user_id))
+        winner_user = winner_res.scalar_one_or_none()
+        loser_user = loser_res.scalar_one_or_none()
+        if winner_user and loser_user:
+            delta = await _calculate_mmr_delta(winner_user.mmr, loser_user.mmr)
+            winner_user.mmr += delta
+            loser_user.mmr = max(0, loser_user.mmr - delta)
+            db.add_all([winner_user, loser_user])
         game.status = "FINISHED"
         game.winner_id = user_id
     else:
