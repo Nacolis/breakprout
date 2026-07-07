@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Home from "./Home";
 import GameScreen from "./game/GameScreen";
+import { buildCookieAuthToken } from "./jwt";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -11,6 +12,16 @@ export default function App() {
     setToken(newToken);
     setUsername(newUsername);
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauthUsername = params.get("username");
+    const oauthId = params.get("id");
+    if (oauthUsername && oauthId) {
+      handleAuthenticated(buildCookieAuthToken(Number(oauthId)), oauthUsername);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   if (gameId !== null && token && username) {
     return (

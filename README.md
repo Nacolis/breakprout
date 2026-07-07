@@ -53,6 +53,8 @@ Breakprout is a web application based on the Breakthrough game, which lets users
 
 * **TypeScript**: A type-safe language based on JavaScript, used to improve maintainability and reduce development errors.
 
+* **Tailwind CSS**: A utility-first CSS framework used to style components directly in markup, ensuring a consistent design system without writing custom CSS.
+
 ## Backend
 
 * **Python 3.14 & UV**: Uses the latest version of Python, powered by the ultra-fast package manager **UV**. It compiles bytecode for better performance and manages a robust virtual environment.
@@ -280,6 +282,9 @@ make help
 
 * **TypeScript**
 	- https://www.typescriptlang.org/docs/
+
+* **Tailwind CSS**
+	- https://tailwindcss.com/docs
 
 * **Python & UV**
 	- https://docs.python.org/3/
